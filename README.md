@@ -59,7 +59,8 @@ energy-db/
 ├── notebooks/
 │   └── 02_forecasting.ipynb      # SQL feature engineering + ML models
 ├── results/                      # query output, benchmark results, charts
-├── report/                       # project report (.docx)
+├── backup/
+│   └── energydb.sql              # full database dump (restore instead of steps 1–2)
 ├── .env.example                  # settings template for the Q&A tool
 ├── .gitignore
 └── README.md
@@ -106,6 +107,11 @@ Run all commands from the project root folder.
 ```bash
 mysql -u root -p -e "CREATE DATABASE energydb;"
 mysql -u root -p energydb -e "source sql/01_schema.sql"
+```
+
+Shortcut: instead of steps 1–2, restore the full database from the dump:
+```bash
+mysql -u root -p -e "source backup/energydb.sql"
 ```
 
 **2. Load the data**

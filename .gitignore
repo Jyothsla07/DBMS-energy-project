@@ -20,3 +20,6 @@ Thumbs.db
 # Report (kept locally)
 *.docx
 ~$*
+
+# Personal setup notes (kept locally)
+backup/NEW_LAPTOP_SETUP.txt

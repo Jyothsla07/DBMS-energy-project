@@ -1,5 +1,5 @@
 -- 04_readonly_user.sql  (MySQL 8.0+)
--- Optional: a SELECT-only account for the question-answering app (python/ask_app.py).
+-- Optional: a SELECT-only account for the question-answering app (python/ask_web.py).
 -- The app already rejects anything but SELECT and runs queries in a read-only
 -- transaction; this account means the database itself also refuses writes.
 --
