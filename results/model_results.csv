@@ -1,0 +1,4 @@
+model,MAE_MW,RMSE_MW,MAPE_%,train_s
+Baseline (1h ago),934.0,1127.0,3.71,0.0
+Linear Regression,697.0,875.0,2.83,0.2
+Random Forest,255.0,350.0,1.05,23.7

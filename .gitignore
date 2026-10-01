@@ -1,0 +1,22 @@
+# Dataset (download from https://doi.org/10.17632/fdfftr3tc2.1)
+data/*.csv
+
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Local environment
+.venv/
+
+# Report (kept locally)
+*.docx
+~$*

@@ -1,0 +1,197 @@
+### rows=315648 | A_no_index | T1_point_lookup
+SELECT * FROM bench WHERE reading_time = '2020-08-18 17:00:00'
+-> Filter: (bench.reading_time = TIMESTAMP'2020-08-18 17:00:00')  (cost=31813 rows=31436) (actual time=150..300 rows=1 loops=1)
+    -> Table scan on bench  (cost=31813 rows=314356) (actual time=0.0362..278 rows=315648 loops=1)
+
+
+### rows=315648 | A_no_index | T2_one_day
+SELECT AVG(electric_demand) FROM bench WHERE reading_time >= '2020-08-18' AND reading_time < '2020-08-19'
+-> Aggregate: avg(bench.electric_demand)  (cost=35305 rows=1) (actual time=245..245 rows=1 loops=1)
+    -> Filter: ((bench.reading_time >= TIMESTAMP'2020-08-18 00:00:00') and (bench.reading_time < TIMESTAMP'2020-08-19 00:00:00'))  (cost=31813 rows=34921) (actual time=132..245 rows=288 loops=1)
+        -> Table scan on bench  (cost=31813 rows=314356) (actual time=0.0172..213 rows=315648 loops=1)
+
+
+### rows=315648 | A_no_index | T3_one_month
+SELECT AVG(electric_demand), AVG(pv_production) FROM bench WHERE reading_time >= '2020-08-01' AND reading_time < '2020-09-01'
+-> Aggregate: avg(bench.electric_demand), avg(bench.pv_production)  (cost=35305 rows=1) (actual time=283..283 rows=1 loops=1)
+    -> Filter: ((bench.reading_time >= TIMESTAMP'2020-08-01 00:00:00') and (bench.reading_time < TIMESTAMP'2020-09-01 00:00:00'))  (cost=31813 rows=34921) (actual time=142..281 rows=8928 loops=1)
+        -> Table scan on bench  (cost=31813 rows=314356) (actual time=0.0367..244 rows=315648 loops=1)
+
+
+### rows=315648 | A_no_index | T4_one_year
+SELECT AVG(electric_demand) FROM bench WHERE reading_time >= '2020-01-01' AND reading_time < '2021-01-01'
+-> Aggregate: avg(bench.electric_demand)  (cost=35305 rows=1) (actual time=293..293 rows=1 loops=1)
+    -> Filter: ((bench.reading_time >= TIMESTAMP'2020-01-01 00:00:00') and (bench.reading_time < TIMESTAMP'2021-01-01 00:00:00'))  (cost=31813 rows=34921) (actual time=82.6..279 rows=105408 loops=1)
+        -> Table scan on bench  (cost=31813 rows=314356) (actual time=0.0423..230 rows=315648 loops=1)
+
+
+### rows=315648 | A_no_index | T5_hot_readings
+SELECT COUNT(*), AVG(electric_demand) FROM bench WHERE temperature >= 38
+-> Aggregate: count(0), avg(bench.electric_demand)  (cost=42290 rows=1) (actual time=252..252 rows=1 loops=1)
+    -> Filter: (bench.temperature >= 38)  (cost=31813 rows=104775) (actual time=155..252 rows=63 loops=1)
+        -> Table scan on bench  (cost=31813 rows=314356) (actual time=0.0172..228 rows=315648 loops=1)
+
+
+### rows=315648 | A_no_index | T6_one_season
+SELECT AVG(electric_demand) FROM bench WHERE season_id = 3
+-> Aggregate: avg(bench.electric_demand)  (cost=34956 rows=1) (actual time=246..246 rows=1 loops=1)
+    -> Filter: (bench.season_id = 3)  (cost=31813 rows=31436) (actual time=38..237 rows=79488 loops=1)
+        -> Table scan on bench  (cost=31813 rows=314356) (actual time=0.0806..215 rows=315648 loops=1)
+
+
+### rows=315648 | B_secondary_time | T1_point_lookup
+SELECT * FROM bench WHERE reading_time = '2020-08-18 17:00:00'
+-> Index lookup on bench using idx_time (reading_time=TIMESTAMP'2020-08-18 17:00:00')  (cost=0.35 rows=1) (actual time=0.01..0.0117 rows=1 loops=1)
+
+
+### rows=315648 | B_secondary_time | T2_one_day
+SELECT AVG(electric_demand) FROM bench WHERE reading_time >= '2020-08-18' AND reading_time < '2020-08-19'
+-> Aggregate: avg(bench.electric_demand)  (cost=159 rows=1) (actual time=0.22..0.22 rows=1 loops=1)
+    -> Index range scan on bench using idx_time over ('2020-08-18 00:00:00' <= reading_time < '2020-08-19 00:00:00'), with index condition: ((bench.reading_time >= TIMESTAMP'2020-08-18 00:00:00') and (bench.reading_time < TIMESTAMP'2020-08-19 00:00:00'))  (cost=130 rows=288) (actual time=0.0083..0.203 rows=288 loops=1)
+
+
+### rows=315648 | B_secondary_time | T3_one_month
+SELECT AVG(electric_demand), AVG(pv_production) FROM bench WHERE reading_time >= '2020-08-01' AND reading_time < '2020-09-01'
+-> Aggregate: avg(bench.electric_demand), avg(bench.pv_production)  (cost=4911 rows=1) (actual time=14.4..14.4 rows=1 loops=1)
+    -> Index range scan on bench using idx_time over ('2020-08-01 00:00:00' <= reading_time < '2020-09-01 00:00:00'), with index condition: ((bench.reading_time >= TIMESTAMP'2020-08-01 00:00:00') and (bench.reading_time < TIMESTAMP'2020-09-01 00:00:00'))  (cost=4018 rows=8928) (actual time=0.0158..12.9 rows=8928 loops=1)
+
+
+### rows=315648 | B_secondary_time | T4_one_year
+SELECT AVG(electric_demand) FROM bench WHERE reading_time >= '2020-01-01' AND reading_time < '2021-01-01'
+-> Aggregate: avg(bench.electric_demand)  (cost=47530 rows=1) (actual time=301..301 rows=1 loops=1)
+    -> Filter: ((bench.reading_time >= TIMESTAMP'2020-01-01 00:00:00') and (bench.reading_time < TIMESTAMP'2021-01-01 00:00:00'))  (cost=31813 rows=157178) (actual time=78.6..287 rows=105408 loops=1)
+        -> Table scan on bench  (cost=31813 rows=314356) (actual time=0.0115..243 rows=315648 loops=1)
+
+
+### rows=315648 | B_secondary_time | T5_hot_readings
+SELECT COUNT(*), AVG(electric_demand) FROM bench WHERE temperature >= 38
+-> Aggregate: count(0), avg(bench.electric_demand)  (cost=42290 rows=1) (actual time=231..231 rows=1 loops=1)
+    -> Filter: (bench.temperature >= 38)  (cost=31813 rows=104775) (actual time=126..231 rows=63 loops=1)
+        -> Table scan on bench  (cost=31813 rows=314356) (actual time=0.0148..210 rows=315648 loops=1)
+
+
+### rows=315648 | B_secondary_time | T6_one_season
+SELECT AVG(electric_demand) FROM bench WHERE season_id = 3
+-> Aggregate: avg(bench.electric_demand)  (cost=34956 rows=1) (actual time=250..250 rows=1 loops=1)
+    -> Filter: (bench.season_id = 3)  (cost=31813 rows=31436) (actual time=36.7..240 rows=79488 loops=1)
+        -> Table scan on bench  (cost=31813 rows=314356) (actual time=0.0148..216 rows=315648 loops=1)
+
+
+### rows=315648 | C_clustered_pk | T1_point_lookup
+SELECT * FROM bench WHERE reading_time = '2020-08-18 17:00:00'
+-> Rows fetched before execution  (cost=0..0 rows=1) (actual time=300e-6..300e-6 rows=1 loops=1)
+
+
+### rows=315648 | C_clustered_pk | T2_one_day
+SELECT AVG(electric_demand) FROM bench WHERE reading_time >= '2020-08-18' AND reading_time < '2020-08-19'
+-> Aggregate: avg(bench.electric_demand)  (cost=86.8 rows=1) (actual time=0.13..0.13 rows=1 loops=1)
+    -> Filter: ((bench.reading_time >= TIMESTAMP'2020-08-18 00:00:00') and (bench.reading_time < TIMESTAMP'2020-08-19 00:00:00'))  (cost=58 rows=288) (actual time=0.0331..0.108 rows=288 loops=1)
+        -> Index range scan on bench using PRIMARY over ('2020-08-18 00:00:00' <= reading_time < '2020-08-19 00:00:00')  (cost=58 rows=288) (actual time=0.0311..0.0827 rows=288 loops=1)
+
+
+### rows=315648 | C_clustered_pk | T3_one_month
+SELECT AVG(electric_demand), AVG(pv_production) FROM bench WHERE reading_time >= '2020-08-01' AND reading_time < '2020-09-01'
+-> Aggregate: avg(bench.electric_demand), avg(bench.pv_production)  (cost=5350 rows=1) (actual time=6.58..6.58 rows=1 loops=1)
+    -> Filter: ((bench.reading_time >= TIMESTAMP'2020-08-01 00:00:00') and (bench.reading_time < TIMESTAMP'2020-09-01 00:00:00'))  (cost=3570 rows=17804) (actual time=0.256..5.2 rows=8928 loops=1)
+        -> Index range scan on bench using PRIMARY over ('2020-08-01 00:00:00' <= reading_time < '2020-09-01 00:00:00')  (cost=3570 rows=17804) (actual time=0.254..2.66 rows=8928 loops=1)
+
+
+### rows=315648 | C_clustered_pk | T4_one_year
+SELECT AVG(electric_demand) FROM bench WHERE reading_time >= '2020-01-01' AND reading_time < '2021-01-01'
+-> Aggregate: avg(bench.electric_demand)  (cost=47275 rows=1) (actual time=73.1..73.1 rows=1 loops=1)
+    -> Filter: ((bench.reading_time >= TIMESTAMP'2020-01-01 00:00:00') and (bench.reading_time < TIMESTAMP'2021-01-01 00:00:00'))  (cost=31543 rows=157318) (actual time=0.53..63 rows=105408 loops=1)
+        -> Index range scan on bench using PRIMARY over ('2020-01-01 00:00:00' <= reading_time < '2021-01-01 00:00:00')  (cost=31543 rows=157318) (actual time=0.523..46.2 rows=105408 loops=1)
+
+
+### rows=315648 | C_clustered_pk | T5_hot_readings
+SELECT COUNT(*), AVG(electric_demand) FROM bench WHERE temperature >= 38
+-> Aggregate: count(0), avg(bench.electric_demand)  (cost=42295 rows=1) (actual time=97.9..97.9 rows=1 loops=1)
+    -> Filter: (bench.temperature >= 38)  (cost=31808 rows=104868) (actual time=52.5..97.8 rows=63 loops=1)
+        -> Table scan on bench  (cost=31808 rows=314636) (actual time=0.313..82 rows=315648 loops=1)
+
+
+### rows=315648 | C_clustered_pk | T6_one_season
+SELECT AVG(electric_demand) FROM bench WHERE season_id = 3
+-> Aggregate: avg(bench.electric_demand)  (cost=34955 rows=1) (actual time=111..111 rows=1 loops=1)
+    -> Filter: (bench.season_id = 3)  (cost=31808 rows=31464) (actual time=16.1..104 rows=79488 loops=1)
+        -> Table scan on bench  (cost=31808 rows=314636) (actual time=0.367..84.6 rows=315648 loops=1)
+
+
+### rows=315648 | D_pk_plus_temp | T1_point_lookup
+SELECT * FROM bench WHERE reading_time = '2020-08-18 17:00:00'
+-> Rows fetched before execution  (cost=0..0 rows=1) (actual time=100e-6..200e-6 rows=1 loops=1)
+
+
+### rows=315648 | D_pk_plus_temp | T2_one_day
+SELECT AVG(electric_demand) FROM bench WHERE reading_time >= '2020-08-18' AND reading_time < '2020-08-19'
+-> Aggregate: avg(bench.electric_demand)  (cost=86.8 rows=1) (actual time=0.0887..0.0888 rows=1 loops=1)
+    -> Filter: ((bench.reading_time >= TIMESTAMP'2020-08-18 00:00:00') and (bench.reading_time < TIMESTAMP'2020-08-19 00:00:00'))  (cost=58 rows=288) (actual time=0.0174..0.0736 rows=288 loops=1)
+        -> Index range scan on bench using PRIMARY over ('2020-08-18 00:00:00' <= reading_time < '2020-08-19 00:00:00')  (cost=58 rows=288) (actual time=0.0163..0.0518 rows=288 loops=1)
+
+
+### rows=315648 | D_pk_plus_temp | T3_one_month
+SELECT AVG(electric_demand), AVG(pv_production) FROM bench WHERE reading_time >= '2020-08-01' AND reading_time < '2020-09-01'
+-> Aggregate: avg(bench.electric_demand), avg(bench.pv_production)  (cost=5350 rows=1) (actual time=2.4..2.4 rows=1 loops=1)
+    -> Filter: ((bench.reading_time >= TIMESTAMP'2020-08-01 00:00:00') and (bench.reading_time < TIMESTAMP'2020-09-01 00:00:00'))  (cost=3570 rows=17804) (actual time=0.207..1.86 rows=8928 loops=1)
+        -> Index range scan on bench using PRIMARY over ('2020-08-01 00:00:00' <= reading_time < '2020-09-01 00:00:00')  (cost=3570 rows=17804) (actual time=0.206..1.33 rows=8928 loops=1)
+
+
+### rows=315648 | D_pk_plus_temp | T4_one_year
+SELECT AVG(electric_demand) FROM bench WHERE reading_time >= '2020-01-01' AND reading_time < '2021-01-01'
+-> Aggregate: avg(bench.electric_demand)  (cost=47275 rows=1) (actual time=68.4..68.5 rows=1 loops=1)
+    -> Filter: ((bench.reading_time >= TIMESTAMP'2020-01-01 00:00:00') and (bench.reading_time < TIMESTAMP'2021-01-01 00:00:00'))  (cost=31543 rows=157318) (actual time=0.751..56.3 rows=105408 loops=1)
+        -> Index range scan on bench using PRIMARY over ('2020-01-01 00:00:00' <= reading_time < '2021-01-01 00:00:00')  (cost=31543 rows=157318) (actual time=0.745..40 rows=105408 loops=1)
+
+
+### rows=315648 | D_pk_plus_temp | T5_hot_readings
+SELECT COUNT(*), AVG(electric_demand) FROM bench WHERE temperature >= 38
+-> Aggregate: count(0), avg(bench.electric_demand)  (cost=34.9 rows=1) (actual time=0.292..0.292 rows=1 loops=1)
+    -> Index range scan on bench using idx_temp over (38 <= temperature), with index condition: (bench.temperature >= 38)  (cost=28.6 rows=63) (actual time=0.265..0.278 rows=63 loops=1)
+
+
+### rows=315648 | D_pk_plus_temp | T6_one_season
+SELECT AVG(electric_demand) FROM bench WHERE season_id = 3
+-> Aggregate: avg(bench.electric_demand)  (cost=34955 rows=1) (actual time=122..122 rows=1 loops=1)
+    -> Filter: (bench.season_id = 3)  (cost=31808 rows=31464) (actual time=22.4..114 rows=79488 loops=1)
+        -> Table scan on bench  (cost=31808 rows=314636) (actual time=0.472..90.3 rows=315648 loops=1)
+
+
+### rows=315648 | E_pk_plus_season | T1_point_lookup
+SELECT * FROM bench WHERE reading_time = '2020-08-18 17:00:00'
+-> Rows fetched before execution  (cost=0..0 rows=1) (actual time=300e-6..400e-6 rows=1 loops=1)
+
+
+### rows=315648 | E_pk_plus_season | T2_one_day
+SELECT AVG(electric_demand) FROM bench WHERE reading_time >= '2020-08-18' AND reading_time < '2020-08-19'
+-> Aggregate: avg(bench.electric_demand)  (cost=86.8 rows=1) (actual time=0.0843..0.0844 rows=1 loops=1)
+    -> Filter: ((bench.reading_time >= TIMESTAMP'2020-08-18 00:00:00') and (bench.reading_time < TIMESTAMP'2020-08-19 00:00:00'))  (cost=58 rows=288) (actual time=0.0172..0.0686 rows=288 loops=1)
+        -> Index range scan on bench using PRIMARY over ('2020-08-18 00:00:00' <= reading_time < '2020-08-19 00:00:00')  (cost=58 rows=288) (actual time=0.0162..0.0495 rows=288 loops=1)
+
+
+### rows=315648 | E_pk_plus_season | T3_one_month
+SELECT AVG(electric_demand), AVG(pv_production) FROM bench WHERE reading_time >= '2020-08-01' AND reading_time < '2020-09-01'
+-> Aggregate: avg(bench.electric_demand), avg(bench.pv_production)  (cost=5350 rows=1) (actual time=3.25..3.25 rows=1 loops=1)
+    -> Filter: ((bench.reading_time >= TIMESTAMP'2020-08-01 00:00:00') and (bench.reading_time < TIMESTAMP'2020-09-01 00:00:00'))  (cost=3570 rows=17804) (actual time=0.205..2.66 rows=8928 loops=1)
+        -> Index range scan on bench using PRIMARY over ('2020-08-01 00:00:00' <= reading_time < '2020-09-01 00:00:00')  (cost=3570 rows=17804) (actual time=0.203..1.53 rows=8928 loops=1)
+
+
+### rows=315648 | E_pk_plus_season | T4_one_year
+SELECT AVG(electric_demand) FROM bench WHERE reading_time >= '2020-01-01' AND reading_time < '2021-01-01'
+-> Aggregate: avg(bench.electric_demand)  (cost=47275 rows=1) (actual time=54.9..54.9 rows=1 loops=1)
+    -> Filter: ((bench.reading_time >= TIMESTAMP'2020-01-01 00:00:00') and (bench.reading_time < TIMESTAMP'2021-01-01 00:00:00'))  (cost=31543 rows=157318) (actual time=0.382..45.5 rows=105408 loops=1)
+        -> Index range scan on bench using PRIMARY over ('2020-01-01 00:00:00' <= reading_time < '2021-01-01 00:00:00')  (cost=31543 rows=157318) (actual time=0.379..30.8 rows=105408 loops=1)
+
+
+### rows=315648 | E_pk_plus_season | T5_hot_readings
+SELECT COUNT(*), AVG(electric_demand) FROM bench WHERE temperature >= 38
+-> Aggregate: count(0), avg(bench.electric_demand)  (cost=42295 rows=1) (actual time=101..101 rows=1 loops=1)
+    -> Filter: (bench.temperature >= 38)  (cost=31808 rows=104868) (actual time=51..101 rows=63 loops=1)
+        -> Table scan on bench  (cost=31808 rows=314636) (actual time=0.218..82.5 rows=315648 loops=1)
+
+
+### rows=315648 | E_pk_plus_season | T6_one_season
+SELECT AVG(electric_demand) FROM bench WHERE season_id = 3
+-> Aggregate: avg(bench.electric_demand)  (cost=27810 rows=1) (actual time=128..128 rows=1 loops=1)
+    -> Index lookup on bench using idx_season (season_id=3)  (cost=14422 rows=133880) (actual time=1.63..120 rows=79488 loops=1)
+
+

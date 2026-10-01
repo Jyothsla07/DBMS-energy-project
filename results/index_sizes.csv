@@ -1,0 +1,6 @@
+rows,config,load_seconds,data_mb,secondary_index_mb
+315648,A_no_index,4.85,23.6,0.0
+315648,B_secondary_time,4.82,23.6,5.5
+315648,C_clustered_pk,4.7,21.5,0.0
+315648,D_pk_plus_temp,5.85,21.5,9.5
+315648,E_pk_plus_season,4.71,21.5,4.5
