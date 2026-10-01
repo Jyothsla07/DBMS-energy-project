@@ -1,0 +1,2 @@
+# Shell scripts run in Linux (Codespaces) and break with Windows line endings
+*.sh text eol=lf

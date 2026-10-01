@@ -1,0 +1,29 @@
+{
+  "name": "Energy DB",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/energy-db",
+  "shutdownAction": "stopCompose",
+
+  // The 3B model needs about 7 GB of memory, so ask for a 16 GB machine
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "16gb"
+  },
+
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    "8000": { "label": "Ask the Energy Database", "onAutoForward": "openBrowser" }
+  },
+
+  // Install packages, wait for the database restore, download the model
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  // Start the web page every time the Codespace opens
+  "postAttachCommand": "python python/ask_web.py",
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python", "ms-toolsai.jupyter"]
+    }
+  }
+}

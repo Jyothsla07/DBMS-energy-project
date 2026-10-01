@@ -99,6 +99,21 @@ On Windows, add MySQL's `bin` folder (e.g. `C:\Program Files\MySQL\MySQL Server 
 
 ---
 
+## Run in GitHub Codespaces (no install)
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Jyothsla07/DBMS-energy-project)
+
+Click the button, then **Create codespace**. The setup in `.devcontainer/` does everything on its own:
+
+1. starts MySQL 8.0 and restores `backup/energydb.sql` (all 315,648 rows),
+2. installs the Python packages,
+3. downloads Qwen2.5-Coder-3B-Instruct (~6 GB),
+4. starts the question-answering web page on port 8000 and opens it in your browser.
+
+The first start takes about 10 minutes; later starts take under a minute. Codespaces have no GPU, so the model runs on the CPU and each question is slower than on a laptop GPU. The forecasting notebook and the other scripts also work in the Codespace terminal (the MySQL password there is `root`). GitHub's free plan includes a monthly allowance of Codespaces hours; stop the Codespace when you are done so it does not use them up.
+
+---
+
 ## How to Run
 
 Run all commands from the project root folder.

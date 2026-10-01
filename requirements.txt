@@ -1,0 +1,12 @@
+# Install PyTorch first, matching your hardware (see README), then:
+#   pip install -r requirements.txt
+pandas
+sqlalchemy
+pymysql
+cryptography
+scikit-learn
+matplotlib
+jupyter
+python-dotenv
+transformers
+accelerate
